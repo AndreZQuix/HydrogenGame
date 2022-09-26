@@ -1,9 +1,9 @@
 using Photon.Pun;
-using System.Collections;
-using System.Collections.Generic;
+using Photon.Realtime;
 using UnityEngine;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPunCallbacks
 {
     [SerializeField] float mouseSensitivity;
     [SerializeField] float sprintSpeed;
@@ -11,6 +11,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float jumpForce;
     [SerializeField] float smoothTime;
     [SerializeField] GameObject cameraHolder;
+    [SerializeField] Item[] items;
+    [SerializeField] float equipCooldownTime;
+
+    int itemIndex;
+    int previousItemIndex = -1;
+    Cooldown equipCooldown;
 
     Rigidbody _rigidbody;
     PhotonView PV;
@@ -24,6 +30,7 @@ public class PlayerController : MonoBehaviour
     {
         _rigidbody = GetComponent<Rigidbody>();
         PV = GetComponent<PhotonView>();
+        equipCooldown = new Cooldown(equipCooldownTime);
     }
 
     private void Update()
@@ -34,6 +41,7 @@ public class PlayerController : MonoBehaviour
         Look();
         CalculateMove();
         TryToJump();
+        TryToEquip();
     }
 
     private void FixedUpdate()
@@ -46,8 +54,15 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        if (!PV.IsMine)
+        if (PV.IsMine)
+        {
+            EquipItem(0); // equip start item
+        }
+        else
+        {
             Destroy(GetComponentInChildren<Camera>().gameObject);
+            Destroy(_rigidbody);
+        }
     }
 
     private void Look()
@@ -75,5 +90,62 @@ public class PlayerController : MonoBehaviour
     public void SetIsGrounded(bool _isGrounded)
     {
         isGrounded = _isGrounded;
+    }
+
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        if (!PV.IsMine && targetPlayer == PV.Owner)
+            EquipItem((int)changedProps["itemIndex"]);
+    }
+
+    private void EquipItem(int index)
+    {
+        if (index == previousItemIndex) // to avoid hiding items by button double click
+            return;
+
+        itemIndex = index;
+        items[itemIndex].itemGameObject.SetActive(true);
+        if (previousItemIndex != -1)
+            items[previousItemIndex].itemGameObject.SetActive(false);
+        previousItemIndex = itemIndex;
+
+        if(PV.IsMine)
+        {
+            Hashtable hash = new Hashtable();
+            hash.Add("itemIndex", itemIndex);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+        }
+
+        equipCooldown.Reset();
+    }
+
+    private void TryToEquip()
+    {
+        if (equipCooldown.IsReady)
+        {
+            for (int i = 0; i < items.Length; i++)
+            {
+                if (Input.GetKeyDown((i + 1).ToString()))
+                {
+                    EquipItem(i);
+                    break;
+                }
+            }
+
+            if (Input.GetAxisRaw("Mouse ScrollWheel") > 0f)
+            {
+                if (itemIndex >= items.Length - 1)
+                    EquipItem(0);
+                else
+                    EquipItem(itemIndex + 1);
+            }
+            else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0f)
+            {
+                if (itemIndex <= 0)
+                    EquipItem(items.Length - 1);
+                else
+                    EquipItem(itemIndex - 1);
+            }
+        }
     }
 }
