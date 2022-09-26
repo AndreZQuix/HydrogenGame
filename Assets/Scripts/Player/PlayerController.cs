@@ -49,9 +49,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         CalculateMove();
         TryToJump();
         TryToEquip();
-
-        if (Input.GetMouseButton(0))
-            items[itemIndex].Use();
+        TryToUseItem();
+        CheckOutOfBounds();
     }
 
     private void FixedUpdate()
@@ -179,5 +178,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     void Die()
     {
         playerManager.Die();
+    }
+
+    void TryToUseItem()
+    {
+        if (Input.GetMouseButton(0))
+            items[itemIndex].Use();
+    }
+
+    void CheckOutOfBounds() // if player is out of level bounds, respawn
+    {
+        if (transform.position.y < -15f)
+            Die();
     }
 }
