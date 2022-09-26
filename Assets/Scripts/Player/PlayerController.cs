@@ -3,7 +3,7 @@ using Photon.Realtime;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class PlayerController : MonoBehaviourPunCallbacks
+public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
     [SerializeField] float mouseSensitivity;
     [SerializeField] float sprintSpeed;
@@ -13,10 +13,13 @@ public class PlayerController : MonoBehaviourPunCallbacks
     [SerializeField] GameObject cameraHolder;
     [SerializeField] Item[] items;
     [SerializeField] float equipCooldownTime;
+    [SerializeField] int maxHealth = 100;
 
     int itemIndex;
     int previousItemIndex = -1;
     Cooldown equipCooldown;
+
+    int currentHealth;
 
     Rigidbody _rigidbody;
     PhotonView PV;
@@ -26,11 +29,15 @@ public class PlayerController : MonoBehaviourPunCallbacks
     Vector3 smoothMoveVelocity;
     Vector3 moveAmount;
 
+    PlayerManager playerManager;
+
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
         PV = GetComponent<PhotonView>();
         equipCooldown = new Cooldown(equipCooldownTime);
+        currentHealth = maxHealth;
+        playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>(); // get the player manager of controller to set respawn method
     }
 
     private void Update()
@@ -42,6 +49,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
         CalculateMove();
         TryToJump();
         TryToEquip();
+
+        if (Input.GetMouseButton(0))
+            items[itemIndex].Use();
     }
 
     private void FixedUpdate()
@@ -54,6 +64,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+
         if (PV.IsMine)
         {
             EquipItem(0); // equip start item
@@ -147,5 +158,26 @@ public class PlayerController : MonoBehaviourPunCallbacks
                     EquipItem(itemIndex - 1);
             }
         }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        PV.RPC(nameof(RPC_TakeDamage), RpcTarget.All, damage);
+    }
+
+    [PunRPC]
+    void RPC_TakeDamage(int damage) // method to send damage data to other clients
+    {
+        if (!PV.IsMine)
+            return;
+
+        currentHealth -= damage;
+        if (currentHealth <= 0)
+            Die();
+    }
+
+    void Die()
+    {
+        playerManager.Die();
     }
 }

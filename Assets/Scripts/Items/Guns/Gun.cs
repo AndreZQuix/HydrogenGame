@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemInfo : ScriptableObject
+public abstract class Gun : Item
 {
-    public string itemName;
+    public abstract override void Use();
 }

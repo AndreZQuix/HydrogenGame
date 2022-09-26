@@ -232,9 +232,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7625778573643025951}
-  - component: {fileID: 5478903308185862654}
   m_Layer: 6
-  m_Name: Gun2Item
+  m_Name: Rifle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -256,20 +255,6 @@ Transform:
   m_Father: {fileID: 2269106815815117501}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5478903308185862654
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3404264104630366466}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae285e966e6c772468aa9d0a68adff39, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itemInfo: {fileID: 11400000, guid: 7ef2f4382b4999342ac6aaeeb9701b10, type: 2}
-  itemGameObject: {fileID: 4231751368263159566}
 --- !u!1 &3415495256036576916
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,8 +322,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2157535908398797465}
+  - component: {fileID: 5682937614809803392}
   m_Layer: 6
-  m_Name: Gun1
+  m_Name: PistolObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -360,6 +346,21 @@ Transform:
   m_Father: {fileID: 6415304113795133575}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5682937614809803392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3735315840460512775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a47179857b485cf499fa55b3e6496003, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemInfo: {fileID: 11400000, guid: 235a58f1f233ac544a075b9a1fef3904, type: 2}
+  itemGameObject: {fileID: 3735315840460512775}
+  cam: {fileID: 5739200245999084661}
 --- !u!1 &3836966918360406669
 GameObject:
   m_ObjectHideFlags: 0
@@ -369,9 +370,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6415304113795133575}
-  - component: {fileID: 702827162565457955}
   m_Layer: 6
-  m_Name: Gun1Item
+  m_Name: Pistol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -393,20 +393,6 @@ Transform:
   m_Father: {fileID: 2269106815815117501}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &702827162565457955
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3836966918360406669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae285e966e6c772468aa9d0a68adff39, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itemInfo: {fileID: 11400000, guid: 235a58f1f233ac544a075b9a1fef3904, type: 2}
-  itemGameObject: {fileID: 3735315840460512775}
 --- !u!1 &4231751368263159566
 GameObject:
   m_ObjectHideFlags: 0
@@ -416,8 +402,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8071435403256892718}
+  - component: {fileID: 2497099420276964648}
   m_Layer: 6
-  m_Name: Gun2
+  m_Name: RifleObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -439,6 +426,21 @@ Transform:
   m_Father: {fileID: 7625778573643025951}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2497099420276964648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4231751368263159566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a47179857b485cf499fa55b3e6496003, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemInfo: {fileID: 11400000, guid: 7ef2f4382b4999342ac6aaeeb9701b10, type: 2}
+  itemGameObject: {fileID: 4231751368263159566}
+  cam: {fileID: 5739200245999084661}
 --- !u!1 &4650735006128546959
 GameObject:
   m_ObjectHideFlags: 0
@@ -710,9 +712,10 @@ MonoBehaviour:
   smoothTime: 0.15
   cameraHolder: {fileID: 2517497066784973587}
   items:
-  - {fileID: 702827162565457955}
-  - {fileID: 5478903308185862654}
+  - {fileID: 5682937614809803392}
+  - {fileID: 2497099420276964648}
   equipCooldownTime: 0.1
+  maxHealth: 100
 --- !u!114 &1641504005465271559
 MonoBehaviour:
   m_ObjectHideFlags: 0
