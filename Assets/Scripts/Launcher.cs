@@ -23,7 +23,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] GameObject playerListItemPrefab;
     [SerializeField] GameObject startGameButton;
 
-    private string playerNickname;
+    private static Dictionary<string, RoomInfo> cachedRoomList = new Dictionary<string, RoomInfo>();
 
     private void Awake()
     {
@@ -34,8 +34,6 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         Debug.Log("Connecting to master");
         PhotonNetwork.ConnectUsingSettings();
-        playerNickname = "Player " + Random.Range(0, 1000).ToString("0000");
-
     }
 
     public override void OnConnectedToMaster()
@@ -49,7 +47,6 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         MenuManager.Singleton.OpenMenu("TitleMenu");
         Debug.Log("Joined lobby");
-        PhotonNetwork.NickName = playerNickname;
     }
 
     public void CreateRoom()
@@ -111,12 +108,18 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         DestroyRoomList();  // clear list to avoid room duplication
 
-        foreach (RoomInfo room in roomList)
+        for(int i = 0; i < roomList.Count; i++)
         {
-            if (room.RemovedFromList)   // do not show the deleted room
-                continue;
+            RoomInfo info = roomList[i];
+            if (info.RemovedFromList)
+                cachedRoomList.Remove(info.Name);
+            else
+                cachedRoomList[info.Name] = info;
+        }
 
-            Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp(room);
+        foreach (KeyValuePair<string, RoomInfo> room in cachedRoomList)
+        {
+            Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp(cachedRoomList[room.Key]);
         }
     }
 
