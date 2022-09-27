@@ -12,18 +12,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     [SerializeField] float jumpForce;
     [SerializeField] float smoothTime;
     [SerializeField] float equipCooldownTime;
-    [SerializeField] int maxHealth = 100;
+    [SerializeField] float maxHealth = 100f;
     [SerializeField] GameObject cameraHolder;
     [SerializeField] Item[] items;
     [SerializeField] Image healthBarImage;
     [SerializeField] GameObject UI;
 
-
     int itemIndex;
     int previousItemIndex = -1;
     Cooldown equipCooldown;
 
-    int currentHealth;
+    float currentHealth;
 
     Rigidbody _rigidbody;
     PhotonView PV;
@@ -166,13 +165,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         PV.RPC(nameof(RPC_TakeDamage), RpcTarget.All, damage);
     }
 
     [PunRPC]
-    void RPC_TakeDamage(int damage) // method to send damage data to other clients
+    void RPC_TakeDamage(float damage) // method to send damage data to other clients
     {
         if (!PV.IsMine)
             return;

@@ -5,5 +5,10 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "FPS/New gun")]
 public class GunInfo : ItemInfo
 {
-    public int damage;
+    public float damage;
+    public float fireRate; // time between shots
+    public float fireRange;
+    public float hitForce; // amount of force applied to rigid body that has been shot
+    public AudioSource gunAudio;
+    public float shotDuration;
 }

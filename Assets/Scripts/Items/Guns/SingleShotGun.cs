@@ -1,6 +1,5 @@
 using Photon.Pun;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SingleShotGun : Gun
@@ -8,25 +7,44 @@ public class SingleShotGun : Gun
     [SerializeField] Camera cam;
 
     PhotonView PV;
+    GunInfo info;
+
+    private float nextFire;
+    private LineRenderer laserLine;
+    private WaitForSeconds shotDuration;
+    public Transform gunEnd;
 
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
+        laserLine = GetComponent<LineRenderer>();
+        info = (GunInfo)itemInfo;
+        shotDuration = new WaitForSeconds(info.shotDuration);
     }
 
     public override void Use()
     {
-        Shoot();
+        if (Time.time > nextFire)
+        {
+            Shoot();
+        }
     }
 
     private void Shoot()
     {
-        Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
-        ray.origin = cam.transform.position;
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        nextFire = Time.time + info.fireRate;
+        StartCoroutine(ShotEffect());
+        Vector3 ray = cam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.0f));
+        laserLine.SetPosition(0, gunEnd.position);
+        if (Physics.Raycast(ray, cam.transform.forward, out RaycastHit hit, info.fireRange))
         {
+            laserLine.SetPosition(1, hit.point);
             hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo)itemInfo).damage);
             PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
+        }
+        else
+        {
+            laserLine.SetPosition(1, ray + (cam.transform.forward * info.fireRange));
         }
     }
 
@@ -41,4 +59,14 @@ public class SingleShotGun : Gun
             bulletImpactObj.transform.SetParent(colliders[0].transform); // parent controls it's bullet impact to avoid channel overload (keep stable connection between clients)
         }
     }
+
+    private IEnumerator ShotEffect()
+    {
+        if(info.gunAudio != null)
+            info.gunAudio.Play();
+
+        laserLine.enabled = true;
+        yield return shotDuration;
+        laserLine.enabled = false;
+    }    
 }
