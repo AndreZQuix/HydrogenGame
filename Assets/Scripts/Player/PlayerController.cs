@@ -6,14 +6,8 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
-    [SerializeField] float mouseSensitivity;
-    [SerializeField] float sprintSpeed;
-    [SerializeField] float walkSpeed;
-    [SerializeField] float jumpForce;
-    [SerializeField] float smoothTime;
     [SerializeField] float equipCooldownTime;
     [SerializeField] float maxHealth = 100f;
-    [SerializeField] GameObject cameraHolder;
     [SerializeField] Item[] items;
     [SerializeField] Image healthBarImage;
     [SerializeField] GameObject UI;
@@ -24,23 +18,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     float currentHealth;
 
-    Rigidbody _rigidbody;
     PhotonView PV;
-
-    float verticalLookRotation;
-    bool isGrounded;
-    Vector3 smoothMoveVelocity;
-    Vector3 moveAmount;
-
+    Rigidbody rb;
+    PlayerMovement playerMovement;
     PlayerManager playerManager;
 
     private void Awake()
     {
-        _rigidbody = GetComponent<Rigidbody>();
         PV = GetComponent<PhotonView>();
+        rb = GetComponent<Rigidbody>();
+        playerMovement = GetComponent<PlayerMovement>();
         equipCooldown = new Cooldown(equipCooldownTime);
         currentHealth = maxHealth;
         playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>(); // get the player manager of controller to set respawn method
+
+        if (!PV.IsMine)
+            playerMovement.enabled = false;
     }
 
     private void Update()
@@ -48,64 +41,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (!PV.IsMine)
             return;
 
-        Look();
-        CalculateMove();
-        TryToJump();
         TryToEquip();
         TryToUseItem();
         CheckOutOfBounds();
     }
 
-    private void FixedUpdate()
-    {
-        if (!PV.IsMine)
-            return;
-
-        _rigidbody.MovePosition(_rigidbody.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
-    }
-
     private void Start()
     {
-
         if (PV.IsMine)
         {
             EquipItem(0); // equip start item
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
         }
         else
         {
             Destroy(GetComponentInChildren<Camera>().gameObject);
-            Destroy(_rigidbody);
+            Destroy(rb);
             Destroy(UI);
         }
-    }
-
-    private void Look()
-    {
-        transform.Rotate(Vector3.up * Input.GetAxisRaw("Mouse X") * mouseSensitivity);
-        verticalLookRotation += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
-        verticalLookRotation = Mathf.Clamp(verticalLookRotation, -90f, 90f);
-        cameraHolder.transform.localEulerAngles = Vector3.left * verticalLookRotation;
-    }
-
-    private void CalculateMove()
-    {
-        Vector3 moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-        moveAmount = Vector3.SmoothDamp(moveAmount, moveDir * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed), ref smoothMoveVelocity, smoothTime);
-    }
-
-    private void TryToJump()
-    {
-        if (Input.GetKey(KeyCode.Space) && isGrounded)
-        {
-            _rigidbody.AddForce(transform.up * jumpForce);
-        }
-    }
-
-    public void SetIsGrounded(bool _isGrounded)
-    {
-        isGrounded = _isGrounded;
     }
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
