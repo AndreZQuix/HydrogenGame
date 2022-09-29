@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float sprintSpeed;
     [SerializeField] private float groundDrag;
     [SerializeField] private float wallRunSpeed;
+    [SerializeField] private float slopeMovementMultiplier;
     private float horizontalInput;
     private float verticalInput;
     private float moveSpeed;
@@ -135,7 +136,7 @@ public class PlayerMovement : MonoBehaviour
             rb.AddForce(GetSlopeMoveDirection() * moveSpeed * 10f, ForceMode.Force);
 
             if (rb.velocity.y > 0)
-                rb.AddForce(Vector3.down * 80f, ForceMode.Force);
+                rb.AddForce(Vector3.down * slopeMovementMultiplier, ForceMode.Force);
         }
         else if(isGrounded)
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);

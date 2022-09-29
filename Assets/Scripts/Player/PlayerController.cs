@@ -127,6 +127,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         currentHealth -= damage;
         healthBarImage.fillAmount = currentHealth / maxHealth;
+        Debug.Log(currentHealth);
         if (currentHealth <= 0)
         {
             Die();

@@ -39,8 +39,8 @@ public class SingleShotGun : Gun
         if (Physics.Raycast(ray, cam.transform.forward, out RaycastHit hit, info.fireRange))
         {
             laserLine.SetPosition(1, hit.point);
-            hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo)itemInfo).damage);
-            PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
+            hit.collider.gameObject.GetComponentInParent<IDamageable>()?.TakeDamage(((GunInfo)itemInfo).damage);
+            PV.RPC(nameof(RPC_Shoot), RpcTarget.All, hit.point, hit.normal);
         }
         else
         {

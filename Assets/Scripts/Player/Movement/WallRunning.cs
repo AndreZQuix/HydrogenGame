@@ -153,6 +153,10 @@ public class WallRunning : MonoBehaviour
     private void StopWallRun()
     {
         pm.isWallRunning = false;
+        isUpwardsRunning = false;
+        isDownwardsRunning = false;
+        useGravity = true;
+        WallJump();
     }
 
     private void WallJump()
