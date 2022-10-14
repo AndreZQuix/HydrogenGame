@@ -14,3 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Rifle
   damage: 30
+  fireRate: 0.6
+  fireRange: 150
+  hitForce: 200
+  shotSound: {fileID: 0}
+  reloadSound: {fileID: 0}
+  reloadDuration: 1
+  shotDuration: 0.07
+  maxAmmo: 10
+  maxInMagazine: 3

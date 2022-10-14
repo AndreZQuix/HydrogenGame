@@ -6,22 +6,25 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
-    [SerializeField] float equipCooldownTime;
-    [SerializeField] float maxHealth = 100f;
-    [SerializeField] Item[] items;
-    [SerializeField] Image healthBarImage;
-    [SerializeField] GameObject UI;
+    [SerializeField] private float equipCooldownTime;
+    [SerializeField] private float maxHealth = 100f;
+    [SerializeField] private Item[] items;
+    [SerializeField] private Image healthBarImage;
+    [SerializeField] private GameObject UI;
+    [SerializeField] private GameObject mainCamera;
+    [SerializeField] private GameObject weaponCamera;
+    [SerializeField] private int itemLayerNumber;
 
-    int itemIndex;
-    int previousItemIndex = -1;
-    Cooldown equipCooldown;
+    private int itemIndex;
+    private int previousItemIndex = -1;
+    private Cooldown equipCooldown;
 
-    float currentHealth;
+    private float currentHealth;
 
-    PhotonView PV;
-    Rigidbody rb;
-    PlayerMovement playerMovement;
-    PlayerManager playerManager;
+    private PhotonView PV;
+    private Rigidbody rb;
+    private PlayerMovement playerMovement;
+    private PlayerManager playerManager;
 
     private void Awake()
     {
@@ -33,7 +36,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>(); // get the player manager of controller to set respawn method
 
         if (!PV.IsMine)
+        {
             playerMovement.enabled = false;
+        }
     }
 
     private void Update()
@@ -48,15 +53,27 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     private void Start()
     {
-        if (PV.IsMine)
+        EquipItem(0); // equip start item
+
+        if (!PV.IsMine)
         {
-            EquipItem(0); // equip start item
+            Destroy(mainCamera);
+            Destroy(weaponCamera);
+            Destroy(rb);
+            Destroy(UI);
         }
         else
         {
-            Destroy(GetComponentInChildren<Camera>().gameObject);
-            Destroy(rb);
-            Destroy(UI);
+            SetItemLevel();
+        }
+    }
+
+    private void SetItemLevel()
+    {
+        foreach (var item in items) // set special item level for item camera to avoid clipping (only for PV owner)
+        {
+            foreach (Transform child in item.transform.GetComponentsInChildren<Transform>(true))
+                child.gameObject.layer = itemLayerNumber;
         }
     }
 
@@ -127,7 +144,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         currentHealth -= damage;
         healthBarImage.fillAmount = currentHealth / maxHealth;
-        Debug.Log(currentHealth);
         if (currentHealth <= 0)
         {
             Die();

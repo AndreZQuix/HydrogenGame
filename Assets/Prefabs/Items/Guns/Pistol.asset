@@ -17,5 +17,9 @@ MonoBehaviour:
   fireRate: 0.25
   fireRange: 50
   hitForce: 100
-  gunAudio: {fileID: 0}
+  shotSound: {fileID: 0}
+  reloadSound: {fileID: 0}
+  reloadDuration: 0.5
   shotDuration: 0.07
+  maxAmmo: 15
+  maxInMagazine: 5

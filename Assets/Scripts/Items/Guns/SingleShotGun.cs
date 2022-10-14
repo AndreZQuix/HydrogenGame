@@ -4,29 +4,40 @@ using UnityEngine;
 
 public class SingleShotGun : Gun
 {
-    [SerializeField] Camera cam;
+    [SerializeField] private Camera cam;
+    [SerializeField] private Transform gunEnd;
+    [SerializeField] private Ammo ammo;
+    [SerializeField] private Animator weaponAnimator;
+    [SerializeField] private KeyCode reloadKey;
 
-    PhotonView PV;
-    GunInfo info;
+    private PhotonView PV;
+    private GunInfo info;
+    public GunInfo Info => info;
 
     private float nextFire;
-    private LineRenderer laserLine;
     private WaitForSeconds shotDuration;
-    public Transform gunEnd;
+
+    private static readonly int reloadAnimKey = Animator.StringToHash("IsReloading");
 
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
-        laserLine = GetComponent<LineRenderer>();
         info = (GunInfo)itemInfo;
         shotDuration = new WaitForSeconds(info.shotDuration);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKey(reloadKey))
+            StartCoroutine(Reload());
     }
 
     public override void Use()
     {
         if (Time.time > nextFire)
         {
-            Shoot();
+            if (ammo.InMagazine > 0)
+                Shoot();
         }
     }
 
@@ -35,17 +46,12 @@ public class SingleShotGun : Gun
         nextFire = Time.time + info.fireRate;
         StartCoroutine(ShotEffect());
         Vector3 ray = cam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.0f));
-        laserLine.SetPosition(0, gunEnd.position);
         if (Physics.Raycast(ray, cam.transform.forward, out RaycastHit hit, info.fireRange))
         {
-            laserLine.SetPosition(1, hit.point);
             hit.collider.gameObject.GetComponentInParent<IDamageable>()?.TakeDamage(((GunInfo)itemInfo).damage);
             PV.RPC(nameof(RPC_Shoot), RpcTarget.All, hit.point, hit.normal);
         }
-        else
-        {
-            laserLine.SetPosition(1, ray + (cam.transform.forward * info.fireRange));
-        }
+        ammo.UpdateAmmo();
     }
 
     [PunRPC]
@@ -62,11 +68,20 @@ public class SingleShotGun : Gun
 
     private IEnumerator ShotEffect()
     {
-        if(info.gunAudio != null)
-            info.gunAudio.Play();
-
-        laserLine.enabled = true;
+        if(info.shotSound != null)
+            info.shotSound.Play();
         yield return shotDuration;
-        laserLine.enabled = false;
-    }    
+    }
+
+    public IEnumerator Reload()
+    {
+        weaponAnimator.SetBool(reloadAnimKey, true);
+
+        if(info.reloadSound != null)
+            info.reloadSound.Play();
+        yield return new WaitForSeconds(info.reloadDuration);
+
+        ammo.Reload();
+        weaponAnimator.SetBool(reloadAnimKey, false);
+    }
 }
