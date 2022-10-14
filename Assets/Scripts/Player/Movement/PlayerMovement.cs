@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float groundDrag;
     [SerializeField] private float wallRunSpeed;
     [SerializeField] private float slopeMovementMultiplier;
+    [SerializeField] private float climbingSpeed;
     private float horizontalInput;
     private float verticalInput;
     private float moveSpeed;
@@ -47,9 +48,10 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody rb;
 
     private MovementState state;
+    public void SetMovementState(MovementState st) { state = st; }
     public enum MovementState
     {
-        Walking, Sprinting, InAir, Crouching, WallRunning
+        Walking, Sprinting, InAir, Crouching, WallRunning, Climbing
     }
 
     private void Start()
@@ -97,6 +99,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void StateMachine()
     {
+        if(state == MovementState.Climbing)
+        {
+            moveSpeed = climbingSpeed;
+        }
+        
         if(isWallRunning)
         {
             state = MovementState.WallRunning;
@@ -130,6 +137,13 @@ public class PlayerMovement : MonoBehaviour
     private void Move()
     {
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+
+        if (state == MovementState.Climbing && Input.GetKeyDown(KeyCode.E))
+        {
+            moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+            rb.AddForce(Vector3.up * moveSpeed * 10f, ForceMode.Force);
+            return;
+        }
 
         if (OnSlope() && !isExitingSlope)
         {

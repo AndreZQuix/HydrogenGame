@@ -89,7 +89,7 @@ public class WallRunning : MonoBehaviour
             if (wallRunTimer > 0)    // fall from wall timer (to avoid infinite wall running)
                 wallRunTimer -= Time.deltaTime;
 
-            if (wallRunTimer <= 0 && pm.isWallRunning)
+            if (pm.isWallRunning && wallRunTimer <= 0)
             {
                 isExitingWall = true;
                 exitWallTimer = exitWallTime;
@@ -156,7 +156,6 @@ public class WallRunning : MonoBehaviour
         isUpwardsRunning = false;
         isDownwardsRunning = false;
         useGravity = true;
-        WallJump();
     }
 
     private void WallJump()

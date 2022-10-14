@@ -15,8 +15,8 @@ TagManager:
   - Checker
   - PostProcessing
   - Wall
-  - 
-  - 
+  - PlayerMesh
+  - Item
   - 
   - 
   - 
