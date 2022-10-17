@@ -12,6 +12,8 @@ public class Ammo : MonoBehaviour
     public int InMagazine { get; private set; }
     public int InBandolier { get; private set; }
 
+    public bool IsFullMagazine => InMagazine == gun.Info.maxInMagazine;
+
     private void Awake()
     {
         AmmoAmount = gun.Info.maxAmmo;
@@ -36,18 +38,15 @@ public class Ammo : MonoBehaviour
 
     public void Reload()
     {
-        if (InMagazine < gun.Info.maxInMagazine)
+        if (InBandolier >= gun.Info.maxInMagazine || InMagazine + InBandolier > gun.Info.maxInMagazine)
         {
-            if (InBandolier >= gun.Info.maxInMagazine || InMagazine + InBandolier > gun.Info.maxInMagazine)
-            {
-                InBandolier -= gun.Info.maxInMagazine - InMagazine;
-                InMagazine = gun.Info.maxInMagazine;
-            }
-            else
-            {
-                InBandolier = 0;
-                InMagazine += InBandolier;
-            }
+            InBandolier -= gun.Info.maxInMagazine - InMagazine;
+            InMagazine = gun.Info.maxInMagazine;
+        }
+        else
+        {
+            InBandolier = 0;
+            InMagazine += InBandolier;
         }
     }
 }

@@ -13,6 +13,7 @@ public class SingleShotGun : Gun
     private PhotonView PV;
     private GunInfo info;
     public GunInfo Info => info;
+    private AudioSource sound;
 
     private float nextFire;
     private WaitForSeconds shotDuration;
@@ -24,11 +25,12 @@ public class SingleShotGun : Gun
         PV = GetComponent<PhotonView>();
         info = (GunInfo)itemInfo;
         shotDuration = new WaitForSeconds(info.shotDuration);
+        sound = GetComponent<AudioSource>();
     }
 
     private void Update()
     {
-        if (Input.GetKey(reloadKey))
+        if (Input.GetKey(reloadKey) && !ammo.IsFullMagazine)
             StartCoroutine(Reload());
     }
 
@@ -68,8 +70,11 @@ public class SingleShotGun : Gun
 
     private IEnumerator ShotEffect()
     {
-        if(info.shotSound != null)
-            info.shotSound.Play();
+        if (info.shotSound != null)
+        {
+            sound.clip = info.shotSound;
+            sound.Play();
+        }
         yield return shotDuration;
     }
 
@@ -77,8 +82,11 @@ public class SingleShotGun : Gun
     {
         weaponAnimator.SetBool(reloadAnimKey, true);
 
-        if(info.reloadSound != null)
-            info.reloadSound.Play();
+        if (info.reloadSound != null)
+        {
+            sound.clip = info.reloadSound;
+            sound.Play();
+        }
         yield return new WaitForSeconds(info.reloadDuration);
 
         ammo.Reload();

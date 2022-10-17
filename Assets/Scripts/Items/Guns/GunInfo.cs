@@ -9,8 +9,8 @@ public class GunInfo : ItemInfo
     public float fireRate; // time between shots
     public float fireRange;
     public float hitForce; // amount of force applied to rigid body that has been shot
-    public AudioSource shotSound;
-    public AudioSource reloadSound;
+    public AudioClip shotSound;
+    public AudioClip reloadSound;
     public float reloadDuration;
     public float shotDuration;
     public int maxAmmo;
