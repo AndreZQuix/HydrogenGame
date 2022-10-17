@@ -64,11 +64,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         else
         {
-            SetItemLevel();
+            SetItemLayer();
         }
     }
 
-    private void SetItemLevel()
+    private void SetItemLayer()
     {
         foreach (var item in items) // set special item level for item camera to avoid clipping (only for PV owner)
         {

@@ -57,7 +57,7 @@ public class WallRunning : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (pm.isWallRunning)
+        if (pm.IsWallRunning)
             WallRun();
     }
 
@@ -83,13 +83,13 @@ public class WallRunning : MonoBehaviour
 
         if((isWallLeft || isWallRight) && verticalInput > 0f && IsAboveGround() && !isExitingWall) // if player is ready to start wall running
         {
-            if (!pm.isWallRunning)
+            if (!pm.IsWallRunning)
                 StartWallRun();
 
             if (wallRunTimer > 0)    // fall from wall timer (to avoid infinite wall running)
                 wallRunTimer -= Time.deltaTime;
 
-            if (pm.isWallRunning && wallRunTimer <= 0)
+            if (pm.IsWallRunning && wallRunTimer <= 0)
             {
                 isExitingWall = true;
                 exitWallTimer = exitWallTime;
@@ -100,7 +100,7 @@ public class WallRunning : MonoBehaviour
         }
         else if(isExitingWall) // smooth wall running
         {
-            if (pm.isWallRunning)
+            if (pm.IsWallRunning)
                 StopWallRun();
 
             if (exitWallTimer > 0)
@@ -111,7 +111,7 @@ public class WallRunning : MonoBehaviour
         }
         else
         {
-            if (pm.isWallRunning)
+            if (pm.IsWallRunning)
                 StopWallRun();
         }
 
@@ -119,7 +119,7 @@ public class WallRunning : MonoBehaviour
 
     private void StartWallRun()
     {
-        pm.isWallRunning = true;
+        pm.IsWallRunning = true;
         wallRunTimer = maxWallRunTime;
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
     }
@@ -152,7 +152,7 @@ public class WallRunning : MonoBehaviour
 
     private void StopWallRun()
     {
-        pm.isWallRunning = false;
+        pm.IsWallRunning = false;
         isUpwardsRunning = false;
         isDownwardsRunning = false;
         useGravity = true;

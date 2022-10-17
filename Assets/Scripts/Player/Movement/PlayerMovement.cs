@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -8,23 +9,33 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float sprintSpeed;
     [SerializeField] private float groundDrag;
     [SerializeField] private float wallRunSpeed;
-    [SerializeField] private float slopeMovementMultiplier;
-    [SerializeField] private float climbingSpeed;
+    [SerializeField] private AudioSource movementAudio;
+    [SerializeField] private AudioClip walkSound;
+    [SerializeField] private AudioClip sprintSound;
     private float horizontalInput;
     private float verticalInput;
     private float moveSpeed;
 
     [HideInInspector]
-    public bool isWallRunning;
+    public bool IsWallRunning;
 
     [Header("Jumping")]
     [SerializeField] private float jumpForce;
     [SerializeField] private float jumpCooldown;
     [SerializeField] private float airMultiplier;
     private bool isReadyToJump;
+    private float tempJumpForce;
+
+    [Header("Ladder climbing")]
+    [SerializeField] private float climbingSpeed;
+    [SerializeField] private AudioClip climbingSound;
+    [SerializeField] private UnityEvent onTryClimbing;
+    [SerializeField] private UnityEvent onStartClimbing;
+    [SerializeField] private UnityEvent onStopClimbing;
 
     [Header("Crouching")]
     [SerializeField] private float crouchSpeed;
+    [SerializeField] private AudioClip crouchSound;
     [SerializeField] private float crouchYScale;
     [SerializeField] private GameObject playerObjectToScale; // object with collider and mesh i.e. player avatar
     private float startYScale;
@@ -33,6 +44,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private KeyCode sprintKey = KeyCode.LeftShift;
     [SerializeField] private KeyCode crouchKey = KeyCode.C;
+    [SerializeField] private KeyCode startClimbKey = KeyCode.E;
+    [SerializeField] private KeyCode stopClimbKey = KeyCode.S;
 
     [Header("Ground Check")]
     [SerializeField] private LayerMask groundLayer;
@@ -41,8 +54,10 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Slope Handling")]
     [SerializeField] float maxSlopeAngle;
+    [SerializeField] private float slopeMovementMultiplier;
     private RaycastHit slopeHit;
     private bool isExitingSlope;
+    private bool turnOffSlopeHandling;
 
     Vector3 moveDirection;
     Rigidbody rb;
@@ -61,6 +76,7 @@ public class PlayerMovement : MonoBehaviour
         isReadyToJump = true;
         startYScale = playerObjectToScale.transform.localScale.y;
         playerHeight = playerObjectToScale.GetComponent<CapsuleCollider>().height;
+        tempJumpForce = jumpForce; // for ladder climbing
     }
 
     private void Update()
@@ -70,6 +86,7 @@ public class PlayerMovement : MonoBehaviour
         SpeedControl();
         UpdateDrag();
         StateMachine();
+        SoundControl();
     }
 
     private void FixedUpdate()
@@ -99,66 +116,92 @@ public class PlayerMovement : MonoBehaviour
 
     private void StateMachine()
     {
-        if(state == MovementState.Climbing)
+        if (state == MovementState.Climbing)
         {
-            moveSpeed = climbingSpeed;
-        }
-        
-        if(isWallRunning)
-        {
-            state = MovementState.WallRunning;
-            moveSpeed = wallRunSpeed;
-        }
-        
-        if (Input.GetKey(crouchKey))
-        {
-            state = MovementState.Crouching;
-            moveSpeed = crouchSpeed;
-        }
-        else if(isGrounded)
-        {
-            if (Input.GetKey(sprintKey))
-            {
-                state = MovementState.Sprinting;
-                moveSpeed = sprintSpeed;
-            } 
-            else
-            {
-                state = MovementState.Walking;
-                moveSpeed = walkSpeed;
-            }
+            TryToClimb();
         }
         else
         {
-            state = MovementState.InAir;
+            StopClimb(); // if player has just finished climbing
+
+            if (IsWallRunning)
+            {
+                state = MovementState.WallRunning;
+                moveSpeed = wallRunSpeed;
+            }
+            else if (Input.GetKey(crouchKey))
+            {
+                state = MovementState.Crouching;
+                moveSpeed = crouchSpeed;
+            }
+            else if (isGrounded)
+            {
+                if (Input.GetKey(sprintKey))
+                {
+                    state = MovementState.Sprinting;
+                    moveSpeed = sprintSpeed;
+                }
+                else
+                {
+                    state = MovementState.Walking;
+                    moveSpeed = walkSpeed;
+                }
+            }
+            else
+            {
+                state = MovementState.InAir;
+            }
         }
     }
 
     private void Move()
     {
-        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-
-        if (state == MovementState.Climbing && Input.GetKeyDown(KeyCode.E))
+        if (!turnOffSlopeHandling)
         {
             moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-            rb.AddForce(Vector3.up * moveSpeed * 10f, ForceMode.Force);
-            return;
-        }
 
-        if (OnSlope() && !isExitingSlope)
+            if (OnSlope() && !isExitingSlope)
+            {
+                rb.AddForce(GetSlopeMoveDirection() * moveSpeed * 10f, ForceMode.Force);
+
+                if (rb.velocity.y > 0)
+                    rb.AddForce(Vector3.down * slopeMovementMultiplier, ForceMode.Force);
+            }
+            else if (isGrounded)
+                rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+            else
+                rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
+
+            if (!IsWallRunning)
+                rb.useGravity = !OnSlope();
+        }
+    }
+
+    private void SoundControl()
+    {
+        if (!movementAudio.isPlaying && IsMoving())
         {
-            rb.AddForce(GetSlopeMoveDirection() * moveSpeed * 10f, ForceMode.Force);
-
-            if (rb.velocity.y > 0)
-                rb.AddForce(Vector3.down * slopeMovementMultiplier, ForceMode.Force);
+            movementAudio.enabled = true;
+            movementAudio.Play();
         }
-        else if(isGrounded)
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
-        else
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
 
-        if(!isWallRunning) 
-            rb.useGravity = !OnSlope();
+        if ((!isGrounded || !IsMoving()) && state != MovementState.Climbing && state != MovementState.WallRunning)
+            movementAudio.enabled = false;
+
+        SwitchWalkSprintSound();
+    }
+
+    private void SwitchWalkSprintSound()
+    {
+        if (state == MovementState.Walking)
+            movementAudio.clip = walkSound;
+        else if (state == MovementState.Sprinting || state == MovementState.WallRunning)
+            movementAudio.clip = sprintSound;
+    }
+
+    private bool IsMoving()
+    {
+        return rb.velocity.magnitude > 2f;
     }
 
     private void SpeedControl() // limit velocity if needed
@@ -208,6 +251,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Crouch()
     {
+        movementAudio.clip = crouchSound;
         playerObjectToScale.transform.localScale = new Vector3(playerObjectToScale.transform.localScale.x, crouchYScale, playerObjectToScale.transform.localScale.z); // reduce the size of player mesh and collider
         rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
     }
@@ -215,6 +259,40 @@ public class PlayerMovement : MonoBehaviour
     private void UnCrouch()
     {
         playerObjectToScale.transform.localScale = new Vector3(playerObjectToScale.transform.localScale.x, startYScale, playerObjectToScale.transform.localScale.z); // set scale back to original size
+    }
+
+    private void TryToClimb()
+    {
+        onTryClimbing?.Invoke();
+
+        if (Input.GetKey(startClimbKey)) // if player pressed interaction key (e.g. E), then he wants to climb (not just collides with ladder)
+            StartClimb();
+
+        if (Input.GetKey(stopClimbKey)) // if player pressed stopClimbKey, then he wants to get off the ladder
+        {
+            StopClimb(); 
+            rb.AddForce(Vector3.down * 10f, ForceMode.Impulse); // add force to pull player to the ground
+        }
+
+        if(isGrounded && Input.GetKey(KeyCode.S)) // if player is grounded and pressed S, then he wants to leave the ladder without climbing
+            state = MovementState.Walking; // this if statement exists to avoid "player sticking" to the ladder
+    }
+
+    private void StartClimb()
+    {
+        movementAudio.clip = climbingSound;
+        rb.useGravity = false;
+        turnOffSlopeHandling = true;
+        jumpForce = climbingSpeed;
+        onStartClimbing?.Invoke();
+    }
+
+    public void StopClimb()
+    {
+        rb.useGravity = true;
+        turnOffSlopeHandling = false;
+        jumpForce = tempJumpForce;
+        onStopClimbing?.Invoke();
     }
 
     private bool OnSlope()
