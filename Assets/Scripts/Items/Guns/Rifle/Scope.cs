@@ -12,10 +12,13 @@ public class Scope : MonoBehaviour
     [SerializeField] private Camera mainCamera;
     [SerializeField] private float zoomFOV;
     [SerializeField] private float scopeOverlayDelay = 0.15f;
+    [SerializeField] private float scopeSensitivityX = 200f;
+    [SerializeField] private float scopeSensitivityY = 200f;
     [SerializeField] private UnityEvent onScope;
     [SerializeField] private UnityEvent onUnscope;
 
     private PhotonView PV;
+    private PlayerCamera playerCam;
     private bool isScoped;
     private float normalFOV;
 
@@ -30,8 +33,11 @@ public class Scope : MonoBehaviour
     private void Start()
     {
         PV = transform.root.GetComponent<PhotonView>();
-        if (PV.IsMine) 
+        if (PV.IsMine)
+        {
             normalFOV = mainCamera.fieldOfView;
+            mainCamera.TryGetComponent(out playerCam);
+        }
     }
 
     private void Update()
@@ -55,6 +61,7 @@ public class Scope : MonoBehaviour
             mainCamera.fieldOfView = zoomFOV;
             weaponCamera.SetActive(false);
             animator.SetBool(ScopeKey, isScoped);
+            playerCam?.SetSensitivity(scopeSensitivityX, scopeSensitivityY);
         }
         onScope.Invoke();
     }
@@ -66,6 +73,7 @@ public class Scope : MonoBehaviour
             mainCamera.fieldOfView = normalFOV;
             weaponCamera.SetActive(true);
             animator.SetBool(ScopeKey, isScoped);
+            playerCam?.SetDefaultSensitivity();
         }
         onUnscope.Invoke();
     }
