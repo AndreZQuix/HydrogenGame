@@ -1,6 +1,7 @@
 using Photon.Pun;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SingleShotGun : Gun
 {
@@ -13,12 +14,13 @@ public class SingleShotGun : Gun
     private PhotonView PV;
     private GunInfo info;
     public GunInfo Info => info;
-    private AudioSource sound;
+    public AudioSource sound;
 
     private float nextFire;
     private WaitForSeconds shotDuration;
 
     private static readonly int reloadAnimKey = Animator.StringToHash("IsReloading");
+    private static readonly int recoilAnimKey = Animator.StringToHash("Recoil");
 
     private void Awake()
     {
@@ -74,7 +76,8 @@ public class SingleShotGun : Gun
         {
             sound.clip = info.shotSound;
             sound.Play();
-        }
+        }weaponAnimator.SetTrigger(recoilAnimKey);
+        
         yield return shotDuration;
     }
 

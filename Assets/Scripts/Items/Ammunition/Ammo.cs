@@ -29,10 +29,6 @@ public class Ammo : MonoBehaviour
     public void UpdateAmmo()
     {
         InMagazine--;
-
-        if (InMagazine == 0 && AmmoAmount > 0)
-            StartCoroutine(gun.Reload());
-
         AmmoAmount = InMagazine + InBandolier;
     }
 

@@ -17,8 +17,8 @@ MonoBehaviour:
   fireRate: 0.6
   fireRange: 150
   hitForce: 200
-  shotSound: {fileID: 0}
-  reloadSound: {fileID: 0}
+  shotSound: {fileID: 8300000, guid: 615b70bd5c49e7441aa06a885978bd5f, type: 3}
+  reloadSound: {fileID: 8300000, guid: 4afb6c11c8eb27b449562a50c514884d, type: 3}
   reloadDuration: 1
   shotDuration: 0.07
   maxAmmo: 10
