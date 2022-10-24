@@ -866,9 +866,10 @@ GameObject:
   - component: {fileID: 5571788716450406403}
   - component: {fileID: 4563978390771646884}
   - component: {fileID: 5554055327361771361}
+  - component: {fileID: 2236398998529381128}
   m_Layer: 0
   m_Name: Rifle
-  m_TagString: Untagged
+  m_TagString: Rifle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -945,7 +946,7 @@ MonoBehaviour:
   bulletImpactPrefab: {fileID: 7258343574859283481, guid: df34cff11c080014e9bdda622cc5f4b8, type: 3}
   cam: {fileID: 5739200245999084661}
   gunEnd: {fileID: 4701756964328607674}
-  ammo: {fileID: 4525627757764181183}
+  ammo: {fileID: 2236398998529381128}
   weaponAnimator: {fileID: 4224046570797689070}
   reloadKey: 114
   sound: {fileID: 5554055327361771361}
@@ -1144,6 +1145,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2236398998529381128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3404264104630366466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 097a57ded8492c24e9784660538cf58b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ammoText: {fileID: 8229687183991218615}
+  gun: {fileID: 5571788716450406403}
 --- !u!1 &3735315840460512775
 GameObject:
   m_ObjectHideFlags: 0
@@ -1153,10 +1168,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2157535908398797465}
-  - component: {fileID: 3483570439404333184}
   m_Layer: 0
   m_Name: PistolObject
-  m_TagString: Untagged
+  m_TagString: Pistol
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1177,20 +1191,6 @@ Transform:
   m_Father: {fileID: 6415304113795133575}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3483570439404333184
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3735315840460512775}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 097a57ded8492c24e9784660538cf58b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ammoText: {fileID: 8229687183991218615}
-  gun: {fileID: 6796843686959186818}
 --- !u!1 &3836966918360406669
 GameObject:
   m_ObjectHideFlags: 0
@@ -1203,11 +1203,12 @@ GameObject:
   - component: {fileID: 1946747234156898895}
   - component: {fileID: 1480639124577986164}
   - component: {fileID: 6796843686959186818}
+  - component: {fileID: 4603597815567108678}
   - component: {fileID: 3694507780736439058}
   - component: {fileID: 212827657312764516}
   m_Layer: 0
   m_Name: Pistol
-  m_TagString: Untagged
+  m_TagString: Pistol
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1284,10 +1285,24 @@ MonoBehaviour:
   bulletImpactPrefab: {fileID: 7258343574859283481, guid: df34cff11c080014e9bdda622cc5f4b8, type: 3}
   cam: {fileID: 5739200245999084661}
   gunEnd: {fileID: 5829893237341560604}
-  ammo: {fileID: 3483570439404333184}
+  ammo: {fileID: 4603597815567108678}
   weaponAnimator: {fileID: 4224046570797689070}
   reloadKey: 114
   sound: {fileID: 212827657312764516}
+--- !u!114 &4603597815567108678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3836966918360406669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 097a57ded8492c24e9784660538cf58b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ammoText: {fileID: 8229687183991218615}
+  gun: {fileID: 6796843686959186818}
 --- !u!120 &3694507780736439058
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -1628,10 +1643,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8071435403256892718}
   - component: {fileID: 1438197905886438552}
-  - component: {fileID: 4525627757764181183}
   m_Layer: 0
   m_Name: RifleObject
-  m_TagString: Untagged
+  m_TagString: Rifle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1749,20 +1763,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
---- !u!114 &4525627757764181183
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4231751368263159566}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 097a57ded8492c24e9784660538cf58b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ammoText: {fileID: 8229687183991218615}
-  gun: {fileID: 5571788716450406403}
 --- !u!1 &4650735006128546959
 GameObject:
   m_ObjectHideFlags: 0

@@ -26,10 +26,10 @@ public class Ammo : MonoBehaviour
         ammoText.text = InMagazine.ToString() + '/' + InBandolier.ToString();
     }
 
-    public void UpdateAmmo()
+    public void UpdateMagazine()
     {
         InMagazine--;
-        AmmoAmount = InMagazine + InBandolier;
+        UpdateAmmoAmount();
     }
 
     public void Reload()
@@ -44,5 +44,16 @@ public class Ammo : MonoBehaviour
             InBandolier = 0;
             InMagazine += InBandolier;
         }
+    }
+
+    public void AddAmmo(int ammo)
+    {
+        InBandolier += ammo;
+        UpdateAmmoAmount();
+    }
+
+    private void UpdateAmmoAmount()
+    {
+        AmmoAmount = InMagazine + InBandolier;
     }
 }

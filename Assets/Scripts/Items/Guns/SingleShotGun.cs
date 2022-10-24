@@ -55,7 +55,7 @@ public class SingleShotGun : Gun
             hit.collider.gameObject.GetComponentInParent<IDamageable>()?.TakeDamage(((GunInfo)itemInfo).damage);
             PV.RPC(nameof(RPC_Shoot), RpcTarget.All, hit.point, hit.normal);
         }
-        ammo.UpdateAmmo();
+        ammo.UpdateMagazine();
     }
 
     [PunRPC]
