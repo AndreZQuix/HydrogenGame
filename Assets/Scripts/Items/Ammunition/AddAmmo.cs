@@ -17,7 +17,6 @@ public class AddAmmo : MonoBehaviour
             {
                 if (string.Equals(a.tag, gun.name))
                 {
-                    Debug.Log(a.gameObject.tag);
                     a.AddAmmo(amountOfAmmo);
                     Destroy(gameObject);
                 }
